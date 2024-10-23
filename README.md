@@ -69,7 +69,9 @@ Abra o navegador no endereço exibido no terminal (http://localhost:8501) para a
 
 ## Filtros Disponíveis
 Período: Selecione o intervalo de datas para visualizar as vendas.
+
 Regiões: Filtre as vendas por regiões específicas.
+
 Produtos: Filtre as vendas por produtos específicos.
 
 ## Customização
