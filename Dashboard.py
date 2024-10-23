@@ -11,7 +11,7 @@ st.title('DASHBOARD DE VENDAS 🛒')
 connection_url = 'mssql+pyodbc://ELLAS/AdventureWorks?driver=SQL+Server&trusted_connection=yes'
 
 # Função para conectar ao banco de dados e carregar os dados
-@st.cache_data(ttl=600)  # Cache com duração de 10 minutos
+@st.cache_data(ttl=600)
 def load_data():
     try:
         engine = create_engine(connection_url)
@@ -31,6 +31,19 @@ def load_data():
     except exc.SQLAlchemyError as e:
         st.error("Erro ao conectar ou ler dados do banco de dados: " + str(e))
         st.stop()
+
+# Função para formatar números grandes
+def format_large_numbers(value):
+    if value >= 1e12:
+        return f'{value / 1e12:.2f}T'
+    elif value >= 1e9:
+        return f'{value / 1e9:.2f}Bi'
+    elif value >= 1e6:
+        return f'{value / 1e6:.2f}M'
+    elif value >= 1e3:
+        return f'{value / 1e3:.2f}K'
+    else:
+        return f'{value:.2f}'
 
 # Carregar os dados
 df = load_data()
@@ -84,18 +97,22 @@ filtered_df = filtered_df[(filtered_df['OrderDate'] >= pd.Timestamp(start_date))
 # Aplicar filtros de regiões e produtos
 filtered_df, available_regions, available_products = filter_region_product(filtered_df, selected_regions, selected_products)
 
+# Arredondando valores
+filtered_df['TotalDue'] = filtered_df['TotalDue'].round(2)
+
 # Cálculos de vendas totais
-total_sales = filtered_df['TotalDue'].sum()
-st.markdown(f"<h2 style='color: #ff5733;'>Total de Vendas: ${total_sales:,.2f}</h2>", unsafe_allow_html=True)
+total_sales = filtered_df['TotalDue'].sum().round(2)
+total_sales_formatted = format_large_numbers(total_sales)
+st.markdown(f"<h2 style='color: #ff5733;'>Total de Vendas: ${total_sales_formatted}</h2>", unsafe_allow_html=True)
 
 # Vendas por produto
-sales_by_product = filtered_df.groupby('ProductName')['TotalDue'].sum().reset_index()
+sales_by_product = filtered_df.groupby('ProductName')['TotalDue'].sum().reset_index().round(2)
 sales_by_product = sales_by_product.sort_values(by='TotalDue', ascending=False)
 
 # Tooltip personalizado
 sales_by_product['HoverText'] = (
     "<b>Produto:</b> " + sales_by_product['ProductName'] + "<br>" +
-    "<b>Total Vendido:</b> $" + sales_by_product['TotalDue'].map('${:,.2f}'.format) + "<br>" +
+    "<b>Total Vendido:</b> " + sales_by_product['TotalDue'].map('${:,.2f}'.format) + "<br>" +
     "<b>Vendas %:</b> " + (sales_by_product['TotalDue'] / total_sales * 100).map('{:.2f}%'.format)
 )
 
@@ -104,7 +121,6 @@ fig_product = px.bar(sales_by_product, x='ProductName', y='TotalDue',
                       labels={'TotalDue': 'Total de Vendas (US$)', 'ProductName': 'Produto'},
                       color='TotalDue',
                       color_continuous_scale=px.colors.sequential.Inferno)
-
 
 fig_product.update_traces(hovertemplate=sales_by_product['HoverText'],
                            customdata=sales_by_product[['HoverText']].values)
@@ -121,12 +137,12 @@ fig_product.update_layout(yaxis_title='Total de Vendas (US$)',
                           height=350)
 
 # Vendas ao longo do tempo
-sales_over_time = filtered_df.groupby(pd.Grouper(key='OrderDate', freq='M'))['TotalDue'].sum().reset_index()
+sales_over_time = filtered_df.groupby(pd.Grouper(key='OrderDate', freq='M'))['TotalDue'].sum().reset_index().round(2)
 
 # Tooltip personalizado
 sales_over_time['HoverText'] = (
     "<b>Data:</b> " + sales_over_time['OrderDate'].dt.strftime('%d/%m/%Y') + "<br>" +
-    "<b>Total Vendido:</b> $" + sales_over_time['TotalDue'].map('${:,.2f}'.format) + "<br>" +
+    "<b>Total Vendido:</b> " + sales_over_time['TotalDue'].map('${:,.2f}'.format) + "<br>" +
     "<b>Vendas %:</b> " + (sales_over_time['TotalDue'] / total_sales * 100).map('{:.2f}%'.format)
 )
 
@@ -135,6 +151,29 @@ fig_time = px.line(sales_over_time, x='OrderDate', y='TotalDue',
                    labels={'TotalDue': 'Total de Vendas (US$)', 'OrderDate': 'Data'},
                    markers=True)
 
+
+for index, row in sales_over_time.iterrows():
+    if row['TotalDue'] >= 1e3:  
+        fig_time.add_annotation(
+            x=row['OrderDate'],
+            y=row['TotalDue'],
+            text=f"${format_large_numbers(row['TotalDue'])}", 
+            showarrow=True,
+            arrowhead=2,
+            ax=0,
+            ay=-40,  
+            font=dict(color="#ff5733")
+        )
+
+# Definindo os valores de gridlines
+gridline_values = [100_000_000, 200_000_000, 300_000_000]
+
+
+fig_time.update_yaxes(
+    tickvals=gridline_values,  
+    showgrid=True, 
+    gridcolor='rgba(255, 255, 255, 0.2)'  
+)
 
 fig_time.update_traces(hovertemplate=sales_over_time['HoverText'],
                         customdata=sales_over_time[['HoverText']].values)
@@ -165,22 +204,19 @@ st.plotly_chart(fig_time, use_container_width=True)
 # Insights na sidebar
 st.sidebar.header('Insights')
 
-average_sales = filtered_df['TotalDue'].mean()
+average_sales = filtered_df['TotalDue'].mean().round(2)
+average_sales_formatted = format_large_numbers(average_sales)
+
 num_orders = filtered_df['TotalDue'].count()
 
 most_sold_product = filtered_df.groupby('ProductName')['TotalDue'].sum().idxmax()
-most_sold_product_sales = filtered_df.groupby('ProductName')['TotalDue'].sum().max()
+most_sales_region = filtered_df.groupby('StateName')['TotalDue'].sum().idxmax()
 
-max_sales_date = filtered_df.groupby('OrderDate')['TotalDue'].sum().idxmax() if not filtered_df.empty else None
-max_sales_value = filtered_df.groupby('OrderDate')['TotalDue'].sum().max() if not filtered_df.empty else 0
-
-max_sales_date_formatted = max_sales_date.strftime('%d/%m/%Y') if max_sales_date is not None else 'Nenhuma data'
-
-# Exibição dos insights
-st.sidebar.write(f"**Produto Mais Vendido:** {most_sold_product} (${most_sold_product_sales:,.2f})")
-st.sidebar.write(f"**Data com Mais Vendas:** {max_sales_date_formatted} (${max_sales_value:,.2f})")
+# Insights formatados
+st.sidebar.write(f"**Produto Mais Vendido:** {most_sold_product}")
+st.sidebar.write(f"**Região com Maiores Vendas:** {most_sales_region}")
 st.sidebar.write(f"**Total de Pedidos:** {num_orders}")
-st.sidebar.write(f"**Média de Vendas:** ${average_sales:,.2f}")
+st.sidebar.write(f"**Média de Vendas por Pedido:** ${average_sales_formatted}")
 
 st.sidebar.markdown("## Observações")
 st.sidebar.write("Esses dados são filtrados com base na seleção de datas e regiões. Utilize os filtros à esquerda para ajustar a visualização.")
