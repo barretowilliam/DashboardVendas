@@ -231,7 +231,6 @@ fig_time = px.line(sales_over_time, x='OrderDate', y='TotalDue',
                    labels={'TotalDue': 'Total de Vendas (US$)', 'OrderDate': 'Data'},
                    markers=True)
 
-
 for index, row in sales_over_time.iterrows():
     if row['TotalDue'] >= 1e3:  
         fig_time.add_annotation(

@@ -61,11 +61,9 @@ Abra o navegador no endereço exibido no terminal (http://localhost:8501) para a
 
 ## Estrutura do Projeto
 
-<<<<<<< HEAD
-├── Dashboard.py           Código principal do dashboard
-=======
+├── Dashboard.py Código principal do dashboard
+
 ├── dashboard_vendas.py Código principal do dashboard
->>>>>>> c50fb91 (dashboardvendasv3)
 
 ├── requirements.txt Dependências do projeto
 
