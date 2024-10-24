@@ -61,13 +61,18 @@ Abra o navegador no endereço exibido no terminal (http://localhost:8501) para a
 
 ## Estrutura do Projeto
 
+<<<<<<< HEAD
 ├── Dashboard.py           Código principal do dashboard
+=======
+├── dashboard_vendas.py Código principal do dashboard
+>>>>>>> c50fb91 (dashboardvendasv3)
 
-├── requirements.txt       Dependências do projeto
+├── requirements.txt Dependências do projeto
 
-└── README.md              Instruções e documentação
+└── README.md Instruções e documentação
 
 ## Filtros Disponíveis
+
 Período: Selecione o intervalo de datas para visualizar as vendas.
 
 Regiões: Filtre as vendas por regiões específicas.
@@ -75,8 +80,10 @@ Regiões: Filtre as vendas por regiões específicas.
 Produtos: Filtre as vendas por produtos específicos.
 
 ## Customização
-O layout e os temas podem ser ajustados diretamente no código dashboard_vendas.py, na seção de gráficos Plotly. O cache dos dados tem duração de 10 minutos, o que pode ser ajustado na função @st.cache_data(ttl=600).
+
+O layout e os temas podem ser ajustados diretamente no código dashboard_vendas.py, na seção de gráficos Plotly. O cache dos dados tem duração de 10 minutos, o que pode ser ajustado na função @st.cache_data(ttl=1800).
 
 ## Problemas Conhecidos
+
 Caso haja problemas na conexão com o banco de dados, revise a URL de conexão e verifique as permissões no SQL Server.
 Se os gráficos não estiverem aparecendo, verifique a instalação da biblioteca Plotly.
