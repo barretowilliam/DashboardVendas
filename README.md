@@ -21,20 +21,22 @@ Este projeto é um Dashboard de Vendas interativo utilizando Streamlit, Pandas, 
 
 Certifique-se de ter os seguintes componentes instalados em sua máquina:
 
-- Python 3.x
+- Python 3.12
 - SQL Server (com a base de dados AdventureWorks)
-- Pip (gerenciador de pacotes do Python)
+- Pip (requirements.txt)
 
 ## Instalação
 
 Clone o repositório para sua máquina local:
 
 ```bash
-git clone https://github.com/usuario/dashboard-vendas.git
-cd dashboard-vendas
+git clone https://github.com/usuario/DashboardVendas.git
+cd Dashboard
+
 Instale as dependências necessárias:
 
 pip install -r requirements.txt
+
 Se o arquivo requirements.txt ainda não estiver criado, adicione as seguintes linhas ao arquivo:
 
 streamlit
@@ -42,17 +44,17 @@ pandas
 plotly
 sqlalchemy
 pyodbc
+
 Configure a conexão com o banco de dados:
 
-Edite a URL de conexão no arquivo dashboard_vendas.py para apontar para o seu servidor SQL e banco de dados:
-
-python
+Edite a URL de conexão no arquivo dashboard_vendas.py para apontar para o seu servidor SQL e banco de dados.
 
 connection_url = 'mssql+pyodbc://SEU_SERVIDOR/AdventureWorks?driver=SQL+Server&trusted_connection=yes'
 Substitua SEU_SERVIDOR pelo nome do seu servidor SQL.
 
-Executando o Projeto
-Para rodar o projeto localmente, execute o comando abaixo no terminal:
+Executando o Projeto:
+
+Para rodar o projeto localmente, execute o comando abaixo no terminal.
 
 streamlit run Dashboard.py
 Abra o navegador no endereço exibido no terminal (http://localhost:8501) para acessar o Dashboard de Vendas.
@@ -77,7 +79,7 @@ Produtos: Filtre as vendas por produtos específicos.
 
 ## Customização
 
-O layout e os temas podem ser ajustados diretamente no código dashboard_vendas.py, na seção de gráficos Plotly. O cache dos dados tem duração de 10 minutos, o que pode ser ajustado na função @st.cache_data(ttl=1800).
+O layout e os temas podem ser ajustados diretamente no código dashboard_vendas.py, na seção de gráficos Plotly. O cache dos dados tem duração de 30 minutos, o que pode ser ajustado na função @st.cache_data(ttl=1800).
 
 ## Problemas Conhecidos
 
