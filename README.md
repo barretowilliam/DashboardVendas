@@ -54,7 +54,7 @@ Substitua SEU_SERVIDOR pelo nome do seu servidor SQL.
 Executando o Projeto
 Para rodar o projeto localmente, execute o comando abaixo no terminal:
 
-streamlit run dashboard_vendas.py
+streamlit run Dashboard.py
 Abra o navegador no endereço exibido no terminal (http://localhost:8501) para acessar o Dashboard de Vendas.
 
 ```
