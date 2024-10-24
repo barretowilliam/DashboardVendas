@@ -63,8 +63,6 @@ Abra o navegador no endereço exibido no terminal (http://localhost:8501) para a
 
 ├── Dashboard.py Código principal do dashboard
 
-├── dashboard_vendas.py Código principal do dashboard
-
 ├── requirements.txt Dependências do projeto
 
 └── README.md Instruções e documentação
